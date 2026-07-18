@@ -1,0 +1,30 @@
+name: Månadskalender
+
+on:
+  schedule:
+    # 17:00 UTC varje dag. generate.js avslutar direkt om det inte är
+    # näst sista dagen i månaden. (Cron i GitHub går alltid i UTC.)
+    - cron: "0 17 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Kör oavsett datum (skickar nästa månads kalender direkt)"
+        type: boolean
+        default: true
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: node src/generate.js
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          FORCE_SEND: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}

@@ -1,0 +1,14 @@
+{
+  "name": "manadskalender",
+  "version": "1.0.0",
+  "description": "Genererar en A4-PDF med nästa månads kalender och mejlar den näst sista dagen i månaden.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/generate.js",
+    "preview": "node src/generate.js --month 2026-08 --dry-run"
+  },
+  "dependencies": {
+    "puppeteer": "^24.10.0",
+    "resend": "^4.5.1"
+  }
+}
