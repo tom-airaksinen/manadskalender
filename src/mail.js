@@ -17,7 +17,9 @@ export async function sendCalendar({ pdf, model, to, from }) {
     to,
     subject: `Kalender – ${label}`,
     text: `Här kommer kalendern för ${model.monthName} ${model.year}.`,
-    attachments: [{ filename, content: pdf.toString('base64') }],
+    // page.pdf() returns a Uint8Array; Buffer.from() is required for correct
+    // base64 (Uint8Array.toString('base64') ignores the arg and emits digits).
+    attachments: [{ filename, content: Buffer.from(pdf).toString('base64') }],
   });
 
   if (error) {
