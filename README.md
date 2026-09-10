@@ -49,5 +49,13 @@ RESEND_API_KEY=... MAIL_TO=du@exempel.se node src/generate.js --force
 
 - **UTC:** 17:00 UTC = 18:00 (vinter) / 19:00 (sommar) svensk tid.
 - **60-dagarsregeln:** GitHub pausar schemalagda workflows efter 60 dagars
-  inaktivitet i repot. En liten commit då och då (eller en keepalive) håller det
-  vid liv.
+  inaktivitet i repot – att jobbet *kör* räknas inte, bara pushar. Workflowen
+  har därför ett **keepalive-steg**: har det gått 30+ dagar sedan senaste
+  commiten skriver den en tidsstämpel till `.github/keepalive` och pushar.
+  Eftersom jobbet går varje dag sker det ungefär en gång i månaden, och
+  varningsmejlet från GitHub ska aldrig dyka upp igen.
+  - Steget har `continue-on-error: true` – om pushen misslyckas skickas
+    kalendermejlet ändå, och nästa dag görs ett nytt försök.
+  - Kräver att Actions får skriva: **Settings → Actions → General →
+    Workflow permissions**. Workflowen begär `contents: write` själv, men står
+    repot på *"Read repository contents permission"* kan pushen ändå nekas.

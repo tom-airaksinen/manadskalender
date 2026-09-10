@@ -15,8 +15,32 @@ on:
 jobs:
   send:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # krävs för keepalive-commiten nedan
     steps:
       - uses: actions/checkout@v5
+
+      # GitHub pausar schemalagda workflows efter 60 dagars inaktivitet i repot.
+      # Att jobbet kör räknas inte – bara pushar gör det. Därför: om det gått
+      # 30+ dagar sedan senaste commiten, knuffa in en tidsstämpel. Eftersom
+      # jobbet går varje dag händer det ungefär en gång i månaden.
+      # continue-on-error: en misslyckad keepalive får aldrig stoppa kalendermejlet.
+      - name: Håll repot vaket (60-dagarsregeln)
+        continue-on-error: true
+        run: |
+          days=$(( ( $(date +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          echo "Dagar sedan senaste commit: $days"
+          if [ "$days" -lt 30 ]; then
+            echo "Under 30 dagar – ingen keepalive behövs."
+            exit 0
+          fi
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/keepalive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/keepalive
+          git commit -m "Keepalive: håll det schemalagda jobbet aktivt"
+          git push origin HEAD:${GITHUB_REF_NAME}
+
       - uses: actions/setup-node@v5
         with:
           node-version: 22
