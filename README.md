@@ -1,5 +1,39 @@
 # Månadskalender
 
+## Årstaskolans matsedel
+
+Ett separat jobb `Årstaskolans matsedel` hämtar fyra veckor från
+https://skolmaten.se/arstaskolan2 och mejlar en stående A4 via samma Resend-secrets.
+Första utskick: söndag 13 september 2026 kl. 17 UTC, för veckorna 38-41.
+Sedan var 28:e dag: 11 oktober, 8 november, 6 december osv.
+17 UTC är kl. 19 svensk sommartid och kl. 18 vintertid.
+
+Webbsidan öppnas i Puppeteer och dess vanliga nästa/föregående-vecka-knappar
+används. Inga API-nycklar från Skolmaten behövs. RSS-adressen
+https://skolmaten.se/api/4/rss/week/arstaskolan2?locale=sv fungerar, men ger bara
+aktuell vecka och ignorerar year/week. Därför används webbsidan för fyra veckor.
+Om webbplatsen ändrar struktur kan hämtningen behöva uppdateras.
+
+Alla publicerade alternativ och deras kategorier inkluderas. Saknade dagar
+markeras `Matsedel ej publicerad` och nämns i mejlet; helt tomma perioder eller
+hämtningsfel stoppar utskicket. Ingen automatisk komplettering görs efteråt.
+Layouten kontrolleras före utskick och avbryter om texten inte ryms läsbart.
+Misslyckade körningar syns under Actions; det finns ingen automatisk omkörning.
+Resends idempotensnyckel skyddar mot samma utskick igen inom tjänstens 24-timmarsfönster.
+
+```bash
+npm ci
+node --test test/school.test.js
+node src/school/generate.js --start 2026-09-14 --dry-run
+```
+
+PDF hamnar i `output/pdf/`. I GitHub Actions kan man köra jobbet manuellt:
+ange första måndagen och behåll `dry_run` för förhandsgranskning, eller avmarkera
+för att mejla. PDF sparas även som workflow-artifact i 90 dagar. GitHub Pages
+behövs inte. Det befintliga kalenderjobbets keepalive håller projektet aktivt.
+
+## Kalendern
+
 Genererar en A4-PDF (liggande) med **nästa månads** kalender och mejlar den till
 mig **17:00 UTC den näst sista dagen i månaden**. Körs som ett schemalagt
 GitHub Actions-jobb. Mejl skickas via [Resend](https://resend.com).

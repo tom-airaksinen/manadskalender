@@ -1,0 +1,50 @@
+name: Årstaskolans matsedel
+
+on:
+  schedule:
+    # Var fjärde söndag kl. 17 UTC, med första period 14 september 2026.
+    # Datumkontrollen ligger i scriptet (28 dagar, även över årsskiften).
+    - cron: '0 17 * * 0'
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'Första måndagen, YYYY-MM-DD (tomt = ordinarie datumkontroll)'
+        type: string
+      dry_run:
+        description: 'Skapa endast PDF, skicka inget mejl'
+        type: boolean
+        default: true
+
+concurrency:
+  group: school-menu
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --test test/school.test.js
+      - run: node src/school/generate.js
+        env:
+          TZ: Europe/Stockholm
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          START_DATE: ${{ inputs.start }}
+          DRY_RUN: ${{ inputs.dry_run }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arstaskolans-matsedel
+          path: output/pdf/*.pdf
+          if-no-files-found: ignore
+          retention-days: 90
