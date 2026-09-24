@@ -29,10 +29,13 @@ export async function fetchWeeks(browser, start, today) {
       const label = direction > 0 ? /^(Next week|Nästa vecka)$/ : /^(Previous week|Föregående vecka)$/;
       const [result] = await Promise.all([
         pending,
-        page.waitForFunction(() => [...document.querySelectorAll('button')].some(el => /^(Next week|Nästa vecka)$/.test(el.textContent.trim()))).then(async () => {
+        page.waitForFunction(direction => {
+          const pattern = direction > 0 ? /^(Next week|Nästa vecka)$/ : /^(Previous week|Föregående vecka)$/;
+          return [...document.querySelectorAll('button')].some(el => pattern.test(el.getAttribute('aria-label') || el.textContent.trim()));
+        }, {}, direction).then(async () => {
           const buttons = await page.$$('button');
           for (const button of buttons) {
-            if (label.test((await button.evaluate(el => el.textContent)).trim())) { await button.click(); return; }
+            if (label.test(await button.evaluate(el => el.getAttribute('aria-label') || el.textContent.trim()))) { await button.click(); return; }
           }
           throw new Error('Hittade inte veckoknappen');
         }),
