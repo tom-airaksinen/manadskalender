@@ -3,10 +3,14 @@ import assert from 'node:assert/strict';
 import { date, iso, week, scheduledStart, normalize } from '../src/school/model.js';
 import { render } from '../src/school/render.js';
 
-test('28-dagarsschema och ISO-årsskifte', () => {
-  assert.equal(iso(scheduledStart(date('2026-09-13'))), '2026-09-14');
-  assert.equal(scheduledStart(date('2026-09-20')), null);
-  assert.equal(iso(scheduledStart(date('2026-10-11'))), '2026-10-12');
+test('Veckoutskick från söndag v43 och ISO-årsskifte', () => {
+  for (const value of ['2026-09-27', '2026-10-04', '2026-10-11', '2026-10-18', '2026-10-24']) {
+    assert.equal(scheduledStart(date(value)), null);
+  }
+  assert.deepEqual(week(date('2026-10-25')), { year: 2026, week: 43 });
+  assert.equal(iso(scheduledStart(date('2026-10-25'))), '2026-10-26');
+  assert.equal(scheduledStart(date('2026-10-26')), null);
+  assert.equal(iso(scheduledStart(date('2026-11-01'))), '2026-11-02');
   assert.equal(iso(scheduledStart(date('2027-01-03'))), '2027-01-04');
   assert.deepEqual(week(date('2027-01-01')), { year: 2026, week: 53 });
   assert.deepEqual(week(date('2027-01-04')), { year: 2027, week: 1 });

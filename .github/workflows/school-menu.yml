@@ -2,8 +2,8 @@ name: Årstaskolans matsedel
 
 on:
   schedule:
-    # Var fjärde söndag kl. 17 UTC, med första period 14 september 2026.
-    # Datumkontrollen ligger i scriptet (28 dagar, även över årsskiften).
+    # Varje söndag kl. 17 UTC, återupptas söndag v43 (25 oktober 2026).
+    # Scriptets datumkontroll stoppar utskick före detta datum.
     - cron: '0 17 * * 0'
   workflow_dispatch:
     inputs:

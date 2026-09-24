@@ -4,8 +4,10 @@
 
 Ett separat jobb `Årstaskolans matsedel` hämtar fyra veckor från
 https://skolmaten.se/arstaskolan2 och mejlar en stående A4 via samma Resend-secrets.
-Första utskick: söndag 13 september 2026 kl. 17 UTC, för veckorna 38-41.
-Sedan var 28:e dag: 11 oktober, 8 november, 6 december osv.
+Efter det manuella utskicket 24 september är nästa automatiska utskick
+söndag vecka 43, den 25 oktober 2026 kl. 17 UTC (kl. 18 svensk tid).
+Därefter skickas en uppdaterad PDF för kommande fyra veckor varje söndag.
+Datumkontrollen stoppar automatiska utskick före 25 oktober.
 17 UTC är kl. 19 svensk sommartid och kl. 18 vintertid.
 
 Webbsidan öppnas i Puppeteer och dess vanliga nästa/föregående-vecka-knappar

@@ -14,9 +14,9 @@ export function week(d) {
   const year = thursday.getUTCFullYear();
   return { year, week: 1 + Math.round((+monday(d) - +monday(date(`${year}-01-04`))) / (7 * DAY)) };
 }
-export function scheduledStart(today, anchor = date('2026-09-14')) {
+export function scheduledStart(today, anchor = date('2026-10-26')) {
   const elapsed = Math.round((+today - +add(anchor, -1)) / DAY);
-  return elapsed >= 0 && elapsed % 28 === 0 ? add(today, 1) : null;
+  return elapsed >= 0 && elapsed % 7 === 0 ? add(today, 1) : null;
 }
 export function normalize(data, start) {
   if (!data?.School?.name?.includes('Årstaskolan')) throw new Error('Oväntad skola i svaret');
